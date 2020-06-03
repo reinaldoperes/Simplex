@@ -2,14 +2,17 @@
 <head>
 	<meta charset="UTF-8">
 	<script type="text/javascript" src="simplex.js" charset="UTF-8"></script>
-	<link href="bootstrap.min.css" rel="stylesheet" />
+	<link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/css/bootstrap.min.css" integrity="sha384-Vkoo8x4CGsO3+Hhxv8T/Q5PaXtkKtu6ug5TOeNV6gBiFeWPGFN9MuhOf23Q9Ifjh" crossorigin="anonymous">
+	<script src="https://code.jquery.com/jquery-3.4.1.slim.min.js" integrity="sha384-J6qa4849blE2+poT4WnyKhv5vZF5SrPo0iEjwBvKU7imGFAV0wwj1yYfoRSJoZ+n" crossorigin="anonymous"></script>
+<script src="https://cdn.jsdelivr.net/npm/popper.js@1.16.0/dist/umd/popper.min.js" integrity="sha384-Q6E9RHvbIyZFJoft+2mJbHaEWldlvI9IOYy5n3zV9zzTtmI3UksdQRVvoxMfooAo" crossorigin="anonymous"></script>
+<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/js/bootstrap.min.js" integrity="sha384-wfSDF2E50Y2D1uUdj0O3uMBJnjuUD4Ih7YwaYd1iqfktj0Uod8GCExl3Og8ifwB6" crossorigin="anonymous"></script>
 	<title>Simplex</title>
 </head>
 <body>	
 	<h1 style="text-align: center;">Simplex</h1>
 	<div class="container" style="margin-top: 5%;">
-		<form id="formSol" name="formSol" class="form">
-			<fieldset>
+		<form id="formSolucao" name="formSolucao" class="form">
+			<fieldset>				
 				<div class="row">
 					<div class="col-md-2">
 						<label for="variaveis" class="lbl1">Informe quantas variáveis:</label>
@@ -30,17 +33,26 @@
 				</div>
 				<br />
 				<div style="float: right; width: 74%;">
-					<input type="submit" class="inp1 btn btn-sm " id="botaoSol" value="Próximo" onClick="criarForm(variaveis.value,qntRest.value)"/>
+					<input type="submit" class="inp1 btn btn-dark" id="botaoProx" value="Próximo" onClick="criarForm(variaveis.value,qntRest.value)"/>
 				</div>
 			</fieldset>
 		</form>
 		
 		<br/>
-		<form action="" method="post" name="form" id="form" style="display:none">
+		<form action="" method="post" name="formVariaveis" id="formVariaveis" style="display:none">
+			<p><b>Objetivo da função:</b></p>
+			<select name="objetivo">
+				<option value="0" selected>Maximização</option>
+				<option value="1">Minimização</option>
+			</select>
+			<br/>
+			<br/>
+			<br/>
 			<p><b>F.O</b></p>
+
 			<div id="num"></div>
 			<br/>
-			<label><input type="button" class="btn btn-sm" id="botaoSol" name="calc" value="Solução" onClick="solucao()" /></label>
+			<label><input type="button" class="btn btn-dark" id="botaoSol" name="calc" value="Solução" onClick="solucao(objetivo.value)" /></label>
 			
 		</form>
 
@@ -53,7 +65,7 @@
 	var my_func = function(event) {
 	event.preventDefault();
 	};
-	var form = document.getElementById("formSol");
+	var form = document.getElementById("formSolucao");
 	form.addEventListener("submit", my_func, true);
 
 	function atualizar() {

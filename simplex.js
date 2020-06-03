@@ -34,12 +34,15 @@ function calcQuadro(p_matriz) {
 	}
 
 	p_matriz[indMenor][0] = p_matriz[0][indMaior];
+	printTabela(p_matriz);
+
 	var aux = p_matriz[indMenor][indMaior];
 
 	if (aux != 1) {
 		for (l = 1; l <= nColunas; l++) {
 			p_matriz[indMenor][l] = p_matriz[indMenor][l] / aux;
 		}
+//		printTabela(p_matriz);
 	}
 
 	for (i = 1; i <= nLinhas; i++) {
@@ -55,7 +58,7 @@ function calcQuadro(p_matriz) {
 function criarForm( p_variaveis, p_restricoes) {	
 
 	if (p_variaveis > 0 && p_restricoes > 0) {
-		document.getElementById("form").style.display = 'block';
+		document.getElementById("formVariaveis").style.display = 'block';
 		document.getElementById("num").innerHTML+="<span>Z = </span>";
 		document.getElementById("num").innerHTML+="<input type='number' class='inputZ  ' required autocomplete='off'  step='0.1'/>x<sub>1</sub>";
 
@@ -78,15 +81,84 @@ function criarForm( p_variaveis, p_restricoes) {
 	}
 } 
 
-function solucao() {
-	var restricoes = parseInt(document.formSol.qntRest.value);
-	var variaveis = parseInt(document.formSol.variaveis.value);	
-	var linhas = parseInt(document.formSol.qntRest.value) + 1;
-	var colunas = parseInt(document.formSol.variaveis.value) + parseInt(document.formSol.qntRest.value) + 1;
+function printTabela(p_matriz) {
+	var restricoes = parseInt(document.formSolucao.qntRest.value);
+	var variaveis = parseInt(document.formSolucao.variaveis.value);
+	var linhas = restricoes+1;
+	var colunas = restricoes + variaveis+1;
+	var tabela = document.createElement("table");
+	tabela.className = "table table-striped table-dark";
+	var thead = document.createElement("thead");
+	var tbody = document.createElement("tbody");
+  
+	var tr = document.createElement("tr");
+	
+	for (var l = 0; l <= colunas; l++) {
+		var variavel = p_matriz[0][l];
+		var th = document.createElement("th");
+		if(l == 0) {
+			var texto = document.createTextNode(variavel);
+			th.appendChild(texto)
+		} else {
+			var sub = document.createElement("sub");
+			var textoSub = document.createTextNode(variavel.substr(1,1));
+			var texto = document.createTextNode(variavel.substr(0,1));
+			sub.appendChild(textoSub)
+			th.appendChild(sub);
+			th.insertBefore(texto, th.firstChild);
+		}
+		tr.appendChild(th);
+	}
+	thead.appendChild(tr);
+	
+
+	for(var n = 1; n <= linhas; n++) {
+		var tr = document.createElement("tr");
+		for(var o = 0; o <= colunas; o++) {
+			var variavel = p_matriz[n][o];
+			var td = document.createElement("td");
+			if (o == 0 && n < linhas) {
+				var sub = document.createElement("sub");
+				var b = document.createElement("b");
+				var textoSub = document.createTextNode(variavel.substr(1,1));
+				var texto = document.createTextNode(variavel.substr(0,1));
+				sub.appendChild(textoSub)
+				b.appendChild(sub);
+				b.insertBefore(texto, b.firstChild);
+				td.appendChild(b);
+			} else {
+				if (variavel != '-Z') {
+					var texto = document.createTextNode(variavel);
+					td.appendChild(texto);
+				} else {
+					var b = document.createElement("b");
+					var texto = document.createTextNode(variavel);
+					b.appendChild(texto);
+					td.appendChild(b);
+				}
+			}
+			tr.appendChild(td);
+		}
+		tbody.appendChild(tr);
+	}
+
+	tabela.appendChild(thead);
+	tabela.appendChild(tbody);
+	tabela.border = 1;
+	document.getElementById("tab").appendChild(tabela);
+}
+
+function solucao(p_objetivo) {
+	var restricoes = parseInt(document.formSolucao.qntRest.value);
+	var variaveis = parseInt(document.formSolucao.variaveis.value);	
+	var linhas = parseInt(document.formSolucao.qntRest.value) + 1;
+	var colunas = parseInt(document.formSolucao.variaveis.value) + parseInt(document.formSolucao.qntRest.value) + 1;
 	
 	document.getElementById("botaoSol").style.display = 'none';
+
+//Criando cabeçalho
 	matriz = [[]];
-	matriz[0][0] = 'VB';
+	matriz[0][0] = 'BASE';
 	
 	var indice = 1;
 	for (var l = 1; l <= variaveis; l++) {
@@ -100,7 +172,9 @@ function solucao() {
 	}
 	
 	matriz[0][matriz[0].length] = 'b';
+/////////////////////////////////////////////////////////////////////
 
+//Preenchendo valores das variáveis e folgas
 	var x = document.querySelectorAll(".input");
 	indice = 0;
 	var coluna = 0;
@@ -123,13 +197,19 @@ function solucao() {
 		matriz[i][coluna] = x[indice].value;
 		indice++;
 	}
-	
+/////////////////////////////////////////////////////////////////////
+
+//Preenchendo última linha (Z)
 	var z = document.querySelectorAll(".inputZ");
 	coluna = 0;
 	matriz.push(['-Z']);
+	var objetivo = 1;
+
+	if (p_objetivo === '1')
+		objetivo = -1;
 	
 	for (var l = 0; l < variaveis; l++) {
-		matriz[linhas][l+1] = parseFloat(z[l].value.replace(",","."));
+		matriz[linhas][l+1] = parseFloat(z[l].value.replace(",","."))*objetivo;
 	}
 	coluna = variaveis + 1;
 	for (var m = 1; m <= restricoes; m++) {
@@ -137,13 +217,22 @@ function solucao() {
 		coluna++;
 	}
 	matriz[linhas][coluna] = 0;
+/////////////////////////////////////////////////////////////////////
 
-	while ( condParada(matriz)) {		
-		   calcQuadro(matriz);
+	document.getElementById("tab").innerHTML+="<p><b>"+"Quadro Inicial"+"</b></p>";
+	printTabela(matriz);
+	var iteracao = 1;
+
+	while (condParada(matriz)) {
+		document.getElementById("tab").innerHTML+="<p><b>Iteração "+iteracao+"</b></p>";		
+		calcQuadro(matriz);
+		iteracao++;
 	}
+
+	document.getElementById("tab").innerHTML+="<p><b>"+"Solução"+"</b></p>";
+	printTabela(matriz);
 	
 	var solucao = "Solução: ";
-	
 	for (var n = 1; n <= variaveis; n++) {
 		var valor = 0;
 		for (var o = 1; o <= restricoes; o++) {
@@ -161,6 +250,6 @@ function solucao() {
 	}
 	
 	var fracao = (matriz[linhas][colunas])*-1;
-	solucao += " e Z = "+fracao;
+	solucao += " e Z = "+fracao*objetivo;
 	document.getElementById("tab").innerHTML+="<p><b>"+solucao+"</b></p>";	
 }
