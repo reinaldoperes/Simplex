@@ -52,7 +52,8 @@
 
 			<div id="num"></div>
 			<br/>
-			<label><input type="button" class="btn btn-dark" id="botaoSol" name="calc" value="Solução" onClick="solucao(objetivo.value)" /></label>
+			<label><input type="button" class="btn btn-dark" id="botaoSol" name="calc" value="Passo a passo" onClick="solucao(objetivo.value, false)" /></label>
+			<label><input type="button" class="btn btn-dark" id="botaoSolDireta" name="calcDireta" value="Solução direta" onClick="solucao(objetivo.value, true)" /></label>
 			
 		</form>
 
@@ -67,9 +68,5 @@
 	};
 	var form = document.getElementById("formSolucao");
 	form.addEventListener("submit", my_func, true);
-
-	function atualizar() {
-	window.location.href='simplex.html';
-}
 </script>
 </html>

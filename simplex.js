@@ -9,7 +9,7 @@ function condParada(p_matriz) {
 	return false;
 }
 
-function calcQuadro(p_matriz) {
+function calcQuadro(p_matriz, p_tipo_solucao) {
 	var nLinhas = p_matriz.length - 1;
 	var nColunas = p_matriz[nLinhas].length - 1;
 	var maior = p_matriz[nLinhas][1];
@@ -34,7 +34,8 @@ function calcQuadro(p_matriz) {
 	}
 
 	p_matriz[indMenor][0] = p_matriz[0][indMaior];
-	printTabela(p_matriz);
+	if(!p_tipo_solucao)
+		printTabela(p_matriz);
 
 	var aux = p_matriz[indMenor][indMaior];
 
@@ -148,13 +149,14 @@ function printTabela(p_matriz) {
 	document.getElementById("tab").appendChild(tabela);
 }
 
-function solucao(p_objetivo) {
+function solucao(p_objetivo, p_tipo_solucao) {
 	var restricoes = parseInt(document.formSolucao.qntRest.value);
 	var variaveis = parseInt(document.formSolucao.variaveis.value);	
 	var linhas = parseInt(document.formSolucao.qntRest.value) + 1;
 	var colunas = parseInt(document.formSolucao.variaveis.value) + parseInt(document.formSolucao.qntRest.value) + 1;
 	
 	document.getElementById("botaoSol").style.display = 'none';
+	document.getElementById("botaoSolDireta").style.display = 'none';
 
 //Criando cabeçalho
 	matriz = [[]];
@@ -219,13 +221,18 @@ function solucao(p_objetivo) {
 	matriz[linhas][coluna] = 0;
 /////////////////////////////////////////////////////////////////////
 
-	document.getElementById("tab").innerHTML+="<p><b>"+"Quadro Inicial"+"</b></p>";
-	printTabela(matriz);
-	var iteracao = 1;
+	if(!p_tipo_solucao)
+	{
+		document.getElementById("tab").innerHTML+="<p><b>"+"Quadro Inicial"+"</b></p>";
+		printTabela(matriz);
+		var iteracao = 1;
+	}
+	
 
 	while (condParada(matriz)) {
-		document.getElementById("tab").innerHTML+="<p><b>Iteração "+iteracao+"</b></p>";		
-		calcQuadro(matriz);
+		if(!p_tipo_solucao)
+			document.getElementById("tab").innerHTML+="<p><b>Iteração "+iteracao+"</b></p>";		
+		calcQuadro(matriz, p_tipo_solucao);
 		iteracao++;
 	}
 
